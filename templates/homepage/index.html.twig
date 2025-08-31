@@ -1,0 +1,147 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Gestion d'événements{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        {# Hero Section #}
+        <div class="jumbotron jumbotron-fluid bg-primary text-white mb-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4">Bienvenue sur notre plateforme d'événements</h1>
+                        <p class="lead">Découvrez et participez aux événements qui vous intéressent</p>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h3 class="display-6">{{ total_evenements }}</h3>
+                                    <small>Événements</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h3 class="display-6">{{ total_participants }}</h3>
+                                    <small>Participants</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            {# Section des événements à venir #}
+            <section class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="h3">Événements à venir</h2>
+                </div>
+
+                {% if evenements_avenir|length > 0 %}
+                    <div class="row">
+                        {% for evenement in evenements_avenir|slice(0, 6) %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0 text-truncate">{{ evenement.titre }}</h5>
+                                        <span class="badge badge-primary">{{ evenement.participants|length }}</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar-alt"></i> 
+                                            {{ evenement.date|date('d/m/Y à H:i') }}
+                                        </small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt"></i> 
+                                            {{ evenement.lieu }}
+                                        </small>
+                                    </div>
+                                    
+                                    {% if evenement.description %}
+                                    <p class="card-text">
+                                        {{ evenement.description|length > 80 ? evenement.description|slice(0, 80) ~ '...' : evenement.description }}
+                                    </p>
+                                    {% endif %}
+
+                                    {# Jours restants #}
+                                    {% set jours_restants = date(evenement.date).diff(date()).days %}
+                                    {% if jours_restants == 0 %}
+                                        <span class="badge badge-warning">Aujourd'hui</span>
+                                    {% elseif jours_restants == 1 %}
+                                        <span class="badge badge-info">Demain</span>
+                                    {% elseif jours_restants <= 7 %}
+                                        <span class="badge badge-success">Dans {{ jours_restants }} jour(s)</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Dans {{ jours_restants }} jour(s)</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" 
+                                       class="btn btn-primary btn-sm btn-block">
+                                        Voir les détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if evenements_avenir|length > 6 %}
+                    <div class="text-center">
+                        <p class="text-muted">Et {{ evenements_avenir|length - 6 }} autre(s) événement(s) à venir...</p>
+                        <a href="{{ path('app_evenement_index') }}" class="btn btn-outline-primary">
+                            Voir tous les événements à venir
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <h5>Aucun événement à venir</h5>
+                        <p class="mb-0">Revenez bientôt pour découvrir de nouveaux événements !</p>
+                    </div>
+                {% endif %}
+            </section>
+
+            {# Section des derniers événements ajoutés #}
+            <section class="mb-5">
+                <h2 class="h3 mb-4">Derniers événements ajoutés</h2>
+                
+                {% if derniers_evenements|length > 0 %}
+                    <div class="row">
+                        {% for evenement in derniers_evenements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-left-success shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title text-success">{{ evenement.titre }}</h6>
+                                            <p class="card-text">
+                                                <small class="text-muted">
+                                                    {{ evenement.date|date('d/m/Y') }} - {{ evenement.lieu }}
+                                                </small>
+                                            </p>
+                                        </div>
+                                        <span class="badge badge-outline-success">{{ evenement.participants|length }}</span>
+                                    </div>
+                                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" 
+                                       class="btn btn-outline-success btn-sm mt-2">
+                                        Découvrir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+{% endblock %}

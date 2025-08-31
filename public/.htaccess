@@ -1,0 +1,11 @@
+# Fichier .htaccess standard pour une application Symfony
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Détermine le chemin de base de l'application si elle est dans un sous-dossier
+    RewriteBase /event_management/public/
+
+    # Redirige les requêtes vers le contrôleur frontal, sauf si le fichier/dossier demandé existe.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

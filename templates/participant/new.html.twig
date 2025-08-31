@@ -1,0 +1,113 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un nouveau participant{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        {# Affichage des messages flash #}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{% if type == 'error' %}danger{% else %}{{ type }}{% endif %} alert-dismissible fade show" role="alert">
+                    {% if type == 'success' %}
+                        <i class="fas fa-check-circle"></i>
+                    {% elseif type == 'error' %}
+                        <i class="fas fa-exclamation-triangle"></i>
+                    {% elseif type == 'warning' %}
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-info text-white">
+                        <h1 class="h3 mb-0">
+                            <i class="fas fa-user-plus"></i> Ajouter un nouveau participant
+                        </h1>
+                    </div>
+                    
+                    {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Jean', 'required': true}}) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.nom, 'Nom de famille', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Dupont', 'required': true}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.email, 'Adresse email', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Ex: jean.dupont@email.com', 'required': true}}) }}
+                            {{ form_errors(form.email) }}
+                            <div class="form-text">Cette adresse doit être unique dans le système</div>
+                        </div>
+
+                        {% if form.evenements is defined %}
+                        <div class="mb-3">
+                            {{ form_label(form.evenements, 'Événements à inscrire (optionnel)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.evenements, {'attr': {'class': 'form-select', 'multiple': true, 'size': 5}}) }}
+                            {{ form_errors(form.evenements) }}
+                            <div class="form-text">Sélectionnez les événements auxquels inscrire ce participant</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('app_participant_index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour à la liste
+                            </a>
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-user-plus"></i> Ajouter le participant
+                            </button>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Script pour la validation des formulaires #}
+    <script>
+        // Validation Bootstrap personnalisée
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            
+                            // Afficher un message d'erreur global
+                            var alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                            alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' +
+                                'Veuillez remplir tous les champs obligatoires avant de continuer. ' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                            
+                            var container = document.querySelector('.container');
+                            container.insertBefore(alertDiv, container.firstChild);
+                            
+                            // Scroll vers le haut pour voir le message
+                            window.scrollTo(0, 0);
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+{% endblock %}

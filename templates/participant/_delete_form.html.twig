@@ -1,0 +1,9 @@
+{# templates/participant/_delete_form.html.twig #}
+<form method="post" action="{{ path('app_participant_delete', {'id': participant.id}) }}" 
+      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce participant ?')" 
+      class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participant.id) }}">
+    <button type="submit" class="btn btn-danger btn-sm">
+        <i class="fas fa-trash"></i> {{ button_label|default('Supprimer') }}
+    </button>
+</form>

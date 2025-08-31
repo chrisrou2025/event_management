@@ -1,0 +1,126 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouvel événement{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        {# Affichage des messages flash #}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{% if type == 'error' %}danger{% else %}{{ type }}{% endif %} alert-dismissible fade show" role="alert">
+                    {% if type == 'success' %}
+                        <i class="fas fa-check-circle"></i>
+                    {% elseif type == 'error' %}
+                        <i class="fas fa-exclamation-triangle"></i>
+                    {% elseif type == 'warning' %}
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h1 class="h3 mb-0">
+                            <i class="fas fa-calendar-plus"></i> Créer un nouvel événement
+                        </h1>
+                    </div>
+                    
+                    {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                {{ form_label(form.titre, 'Titre de l\'événement', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Conférence développement web', 'required': true}}) }}
+                                {{ form_errors(form.titre) }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.date, 'Date et heure', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.date, {'attr': {'class': 'form-control', 'required': true}}) }}
+                                {{ form_errors(form.date) }}
+                                <div class="form-text">Sélectionnez la date et l'heure de l'événement</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.lieu, 'Lieu de l\'événement', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.lieu, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Salle de conférence A', 'required': true}}) }}
+                                {{ form_errors(form.lieu) }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                {{ form_label(form.description, 'Description (optionnelle)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez votre événement...'}}) }}
+                                {{ form_errors(form.description) }}
+                            </div>
+                        </div>
+
+                        {% if form.participants is defined %}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                {{ form_label(form.participants, 'Participants à inscrire (optionnel)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.participants, {'attr': {'class': 'form-select', 'multiple': true, 'size': 5}}) }}
+                                {{ form_errors(form.participants) }}
+                                <div class="form-text">Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs participants</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour à la liste
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Créer l'événement
+                            </button>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Script pour la validation des formulaires #}
+    <script>
+        // Validation Bootstrap personnalisée
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            
+                            // Afficher un message d'erreur global
+                            var alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                            alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' +
+                                'Veuillez remplir tous les champs obligatoires avant de continuer. ' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                            
+                            var container = document.querySelector('.container');
+                            container.insertBefore(alertDiv, container.firstChild);
+                            
+                            // Scroll vers le haut pour voir le message
+                            window.scrollTo(0, 0);
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+{% endblock %}

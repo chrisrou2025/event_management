@@ -1,0 +1,92 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le participant - {{ participant.prenom }} {{ participant.nom }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">
+                            <i class="fas fa-user-edit"></i> Modifier : {{ participant.prenom }} {{ participant.nom }}
+                        </h1>
+                    </div>
+                    
+                    {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'required': true}}) }}
+                                {{ form_errors(form.prenom) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.nom, 'Nom de famille', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'required': true}}) }}
+                                {{ form_errors(form.nom) }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.email, 'Adresse email', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control', 'required': true}}) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        {% if form.evenements is defined %}
+                        <div class="mb-3">
+                            {{ form_label(form.evenements, 'Événements inscrits', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.evenements, {'attr': {'class': 'form-select', 'multiple': true, 'size': 5}}) }}
+                            {{ form_errors(form.evenements) }}
+                            <div class="form-text">
+                                Actuellement inscrit à {{ participant.evenements|length }} événement(s)
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{{ path('app_participant_show', {'id': participant.id}) }}" class="btn btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir le profil
+                                </a>
+                                <a href="{{ path('app_participant_index') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-list"></i> Liste des participants
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Sauvegarder les modifications
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+
+                {# Formulaire de suppression séparé #}
+                <div class="mt-3">
+                    <div class="card border-danger">
+                        <div class="card-body">
+                            <h6 class="card-title text-danger">Zone de danger</h6>
+                            <p class="card-text text-muted">
+                                La suppression de ce participant le retirera automatiquement de tous ses événements.
+                            </p>
+                            <form method="post" action="{{ path('app_participant_delete', {'id': participant.id}) }}" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce participant ?')" 
+                                  class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participant.id) }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Supprimer définitivement
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
