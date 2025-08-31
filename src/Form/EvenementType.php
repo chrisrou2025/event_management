@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class EvenementType extends AbstractType
 {
@@ -93,6 +94,15 @@ class EvenementType extends AbstractType
                     'size' => 5
                 ],
                 'help' => 'Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs participants'
+            ])
+            ->add('imageFile', VichImageType::class, [
+                'required' => false,
+                'allow_delete' => true,
+                'download_uri' => false,
+                'image_uri' => true,
+                'label' => 'Image de l\'événement',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Formats acceptés : JPG, PNG (max 5Mo)',
             ]);
     }
 

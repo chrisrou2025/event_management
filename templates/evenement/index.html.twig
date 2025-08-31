@@ -1,4 +1,3 @@
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Gestion des événements{% endblock %}
@@ -47,6 +46,9 @@
                     {% for evenement in evenements_avenir %}
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow-sm border-start border-success border-3">
+                            {% if evenement.image %}
+                                <img src="{{ asset('uploads/images/events/' ~ evenement.image) }}" alt="{{ evenement.titre }}" class="card-img-top" style="max-height: 150px; object-fit: cover;">
+                            {% endif %}
                             <div class="card-header bg-success bg-gradient text-white">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="card-title mb-0 text-truncate">{{ evenement.titre }}</h5>
@@ -89,12 +91,10 @@
                             </div>
                             <div class="card-footer bg-white">
                                 <div class="btn-group w-100" role="group">
-                                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" 
-                                       class="btn btn-outline-success btn-sm">
+                                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-outline-success btn-sm">
                                         <i class="fas fa-eye"></i> Détails
                                     </a>
-                                    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" 
-                                       class="btn btn-outline-primary btn-sm">
+                                    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-edit"></i> Modifier
                                     </a>
                                 </div>
@@ -108,7 +108,7 @@
 
             {# Section des événements passés #}
             {% if evenements_passes|length > 0 %}
-            <section class="mb-4">
+            <section class="mb-5">
                 <div class="d-flex align-items-center mb-3">
                     <h3 class="h4 mb-0">
                         <span class="badge bg-secondary me-2">{{ evenements_passes|length }}</span>
@@ -119,6 +119,9 @@
                     {% for evenement in evenements_passes %}
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow-sm opacity-75">
+                            {% if evenement.image %}
+                                <img src="{{ asset('uploads/images/events/' ~ evenement.image) }}" alt="{{ evenement.titre }}" class="card-img-top" style="max-height: 150px; object-fit: cover;">
+                            {% endif %}
                             <div class="card-header bg-secondary text-white">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="card-title mb-0 text-truncate">{{ evenement.titre }}</h5>
