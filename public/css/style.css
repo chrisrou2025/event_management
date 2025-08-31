@@ -1,0 +1,14 @@
+footer {
+    background-color: #343a40;
+    padding: 2rem 0;
+}
+footer h5 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+footer .text-muted {
+    font-size: 0.9rem;
+}
+.navbar form input {
+    max-width: 200px;
+}

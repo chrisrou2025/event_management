@@ -31,19 +31,21 @@ final class EvenementController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                // Synchroniser les relations bidirectionnelles
+                foreach ($evenement->getParticipants() as $participant) {
+                    $participant->addEvenement($evenement);
+                }
+
                 $entityManager->persist($evenement);
                 $entityManager->flush();
 
-                // Message de succès
                 $this->addFlash('success', 'L\'événement "' . $evenement->getTitre() . '" a été créé avec succès !');
 
                 return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
             } catch (\Exception $e) {
-                // Message d'erreur
                 $this->addFlash('error', 'Erreur lors de la création de l\'événement : ' . $e->getMessage());
             }
         } elseif ($form->isSubmitted() && !$form->isValid()) {
-            // Message d'erreur pour formulaire invalide
             $this->addFlash('warning', 'Le formulaire contient des erreurs. Veuillez vérifier les champs obligatoires.');
         }
 
@@ -64,23 +66,33 @@ final class EvenementController extends AbstractController
     #[Route('/{id}/edit', name: 'app_evenement_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
+        // Sauvegarder les participants actuels pour comparaison
+        $participantsOriginaux = clone $evenement->getParticipants();
+        
         $form = $this->createForm(EvenementType::class, $evenement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                // Nettoyer les anciennes relations
+                foreach ($participantsOriginaux as $participant) {
+                    $participant->removeEvenement($evenement);
+                }
+                
+                // Établir les nouvelles relations
+                foreach ($evenement->getParticipants() as $participant) {
+                    $participant->addEvenement($evenement);
+                }
+
                 $entityManager->flush();
 
-                // Message de succès
                 $this->addFlash('success', 'L\'événement "' . $evenement->getTitre() . '" a été modifié avec succès !');
 
                 return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
             } catch (\Exception $e) {
-                // Message d'erreur
                 $this->addFlash('error', 'Erreur lors de la modification : ' . $e->getMessage());
             }
         } elseif ($form->isSubmitted() && !$form->isValid()) {
-            // Message d'erreur pour formulaire invalide
             $this->addFlash('warning', 'Le formulaire contient des erreurs. Veuillez corriger les champs indiqués.');
         }
 
@@ -95,18 +107,21 @@ final class EvenementController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->getPayload()->getString('_token'))) {
             try {
-                $titre = $evenement->getTitre(); // Sauvegarder le titre avant suppression
+                $titre = $evenement->getTitre();
+                
+                // Nettoyer les relations avant suppression
+                foreach ($evenement->getParticipants() as $participant) {
+                    $participant->removeEvenement($evenement);
+                }
+                
                 $entityManager->remove($evenement);
                 $entityManager->flush();
 
-                // Message de succès
                 $this->addFlash('success', 'L\'événement "' . $titre . '" a été supprimé avec succès.');
             } catch (\Exception $e) {
-                // Message d'erreur
                 $this->addFlash('error', 'Erreur lors de la suppression : ' . $e->getMessage());
             }
         } else {
-            // Token CSRF invalide
             $this->addFlash('error', 'Token de sécurité invalide. Veuillez réessayer.');
         }
 

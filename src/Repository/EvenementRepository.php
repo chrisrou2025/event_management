@@ -72,4 +72,34 @@ class EvenementRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Recherche les événements par lieu (recherche partielle)
+     */
+    public function findByLieu(string $lieu): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.lieu LIKE :lieu')
+            ->setParameter('lieu', '%' . $lieu . '%')
+            ->orderBy('e.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Recherche les événements par date (journée entière)
+     */
+    public function findByDate(\DateTime $date): array
+    {
+        $startOfDay = (clone $date)->setTime(0, 0);
+        $endOfDay = (clone $date)->setTime(23, 59, 59);
+
+        return $this->createQueryBuilder('e')
+            ->where('e.date BETWEEN :start AND :end')
+            ->setParameter('start', $startOfDay)
+            ->setParameter('end', $endOfDay)
+            ->orderBy('e.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

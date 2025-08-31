@@ -1,221 +1,130 @@
-
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Gestion d'événements{% endblock %}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>📅</text></svg>">
-        
-        {# Bootstrap CSS #}
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        {# Font Awesome #}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        
-        {# CSS personnalisé #}
-        <style>
-            body {
-                background-color: #f8f9fa;
-            }
-            .jumbotron {
-                padding: 4rem 2rem;
-                margin-bottom: 2rem;
-                background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-                border-radius: 0.5rem;
-            }
-            .border-start {
-                border-left-width: 4px !important;
-            }
-            .card {
-                transition: transform 0.2s;
-            }
-            .card:hover {
-                transform: translateY(-2px);
-            }
-            .flash-messages {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1050;
-                max-width: 400px;
-            }
-            .was-validated .form-control:invalid {
-                border-color: #dc3545;
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-                background-repeat: no-repeat;
-                background-position: right calc(0.375em + 0.1875rem) center;
-                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-            }
-            .was-validated .form-control:valid {
-                border-color: #198754;
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.94-.94 2.94 2.94 4.25-4.25.94.94-5.19 5.19-3.88-3.88z'/%3e%3c/svg%3e");
-                background-repeat: no-repeat;
-                background-position: right calc(0.375em + 0.1875rem) center;
-                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-            }
-        </style>
-        
-        {% block stylesheets %}
-        {% endblock %}
-    </head>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>
+			{% block title %}Gestion d'Événements
+			{% endblock %}
+		</title>
 
-    <body>
-        {# Navigation principale #}
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="{{ path('homepage') }}">
-                    <i class="fas fa-calendar-alt"></i> Gestion d'Événements
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('homepage') }}">
-                                <i class="fas fa-home"></i> Accueil
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_evenement_index') }}">
-                                <i class="fas fa-calendar"></i> Événements
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_participant_index') }}">
-                                <i class="fas fa-users"></i> Participants
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-plus"></i> Ajouter
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('app_evenement_new') }}">
-                                    <i class="fas fa-calendar-plus"></i> Nouvel événement
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ path('app_participant_new') }}">
-                                    <i class="fas fa-user-plus"></i> Nouveau participant
-                                </a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+		{# Bootstrap CSS #}
+		<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-        {# Zone des messages flash - positionnée en haut à droite #}
-        <div class="flash-messages">
-            {% for type, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="alert alert-{% if type == 'error' %}danger{% else %}{{ type }}{% endif %} alert-dismissible fade show shadow" role="alert">
-                        {% if type == 'success' %}
-                            <i class="fas fa-check-circle"></i>
-                        {% elseif type == 'error' %}
-                            <i class="fas fa-exclamation-triangle"></i>
-                        {% elseif type == 'warning' %}
-                            <i class="fas fa-exclamation-circle"></i>
-                        {% elseif type == 'info' %}
-                            <i class="fas fa-info-circle"></i>
-                        {% endif %}
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endfor %}
-        </div>
+		{# Font Awesome #}
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-        {# Contenu principal #}
-        <main>
-            {% block body %}{% endblock %}
-        </main>
+		<script src="{{ asset('js/app.js') }}"></script>
+		<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-        {# Footer #}
-        <footer class="bg-dark text-white mt-5 py-4">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Gestion d'Événements</h5>
-                        <p class="text-muted">Plateforme de gestion d'événements et de participants</p>
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <small class="text-muted">
-                            © {{ 'now'|date('Y') }} - Développé avec Symfony
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </footer>
+		{% block stylesheets %}{% endblock %}
+	</head>
+	<body>
+		{# Navigation principale #}
+		<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+			<div class="container">
+				<a class="navbar-brand" href="{{ path('homepage') }}">
+					Gestion d'Événements
+				</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link {{ app.request.attributes.get('_route') == 'homepage' ? 'active' : '' }}" href="{{ path('homepage') }}">
+								<i class="fas fa-home me-1"></i>
+								Accueil
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_evenement_' ? 'active' : '' }}" href="{{ path('app_evenement_index') }}">
+								<i class="fas fa-calendar me-1"></i>
+								Événements
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_participant_' ? 'active' : '' }}" href="{{ path('app_participant_index') }}">
+								<i class="fas fa-users me-1"></i>
+								Participants
+							</a>
+						</li>
+					</ul>
+					<form class="d-flex" action="{{ path('homepage') }}" method="get">
+						<input class="form-control me-2" type="search" name="query" placeholder="Lieu ou date (jj/mm/aaaa)" aria-label="Recherche">
+						<button class="btn btn-outline-light" type="submit">
+							<i class="fas fa-search"></i>
+						</button>
+					</form>
+					<ul class="navbar-nav ms-2">
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="fas fa-plus-circle me-1"></i>
+								Ajouter
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+								<li>
+									<a class="dropdown-item" href="{{ path('app_evenement_new') }}">Nouvel événement</a>
+								</li>
+								<li>
+									<a class="dropdown-item" href="{{ path('app_participant_new') }}">Nouveau participant</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
 
-        {# Bootstrap JavaScript #}
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
-        {# Script de validation globale #}
-        <script>
-            // Validation Bootstrap pour tous les formulaires
-            (function() {
-                'use strict';
-                window.addEventListener('load', function() {
-                    var forms = document.getElementsByClassName('needs-validation');
-                    var validation = Array.prototype.filter.call(forms, function(form) {
-                        form.addEventListener('submit', function(event) {
-                            if (form.checkValidity() === false) {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                
-                                // Trouver le premier champ invalide et focus dessus
-                                var firstInvalidField = form.querySelector(':invalid');
-                                if (firstInvalidField) {
-                                    firstInvalidField.focus();
-                                }
-                                
-                                // Afficher une notification
-                                showNotification('warning', 'Veuillez remplir tous les champs obligatoires');
-                            }
-                            form.classList.add('was-validated');
-                        }, false);
-                    });
-                });
-            })();
+		{# Zone des messages flash - positionnée en haut à droite #}
+		<div class="container mt-3">
+			{% for type, messages in app.flashes %}
+				{% for message in messages %}
+					<div class="alert alert-{{ type }} alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert" style="z-index: 1000;">
+						{% if type == 'success' %}
+							<i class="fas fa-check-circle me-2"></i>
+						{% elseif type == 'error' %}
+							<i class="fas fa-exclamation-circle me-2"></i>
+						{% elseif type == 'warning' %}
+							<i class="fas fa-exclamation-triangle me-2"></i>
+						{% elseif type == 'info' %}
+							<i class="fas fa-info-circle me-2"></i>
+						{% endif %}
+						{{ message }}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				{% endfor %}
+			{% endfor %}
+		</div>
 
-            // Fonction pour afficher des notifications
-            function showNotification(type, message) {
-                var alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-' + (type === 'error' ? 'danger' : type) + ' alert-dismissible fade show shadow';
-                alertDiv.innerHTML = '<i class="fas fa-' + 
-                    (type === 'success' ? 'check-circle' : 
-                     type === 'error' ? 'exclamation-triangle' : 
-                     type === 'warning' ? 'exclamation-circle' : 'info-circle') + 
-                    '"></i> ' + message + 
-                    '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-                
-                var flashContainer = document.querySelector('.flash-messages');
-                flashContainer.appendChild(alertDiv);
-                
-                // Auto-remove après 5 secondes
-                setTimeout(function() {
-                    if (alertDiv.parentNode) {
-                        alertDiv.remove();
-                    }
-                }, 5000);
-            }
+		{# Contenu principal #}
+		<main class="container my-4"> {% block body %}{% endblock %}
+			</main>
 
-            // Auto-hide flash messages après 5 secondes
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                    var alerts = document.querySelectorAll('.flash-messages .alert');
-                    alerts.forEach(function(alert) {
-                        var bsAlert = new bootstrap.Alert(alert);
-                        bsAlert.close();
-                    });
-                }, 5000);
-            });
-        </script>
-        
-        {% block javascripts %}
-        {% endblock %}
-    </body>
-</html>
+			{# Footer #}
+			<footer class="bg-dark text-white py-4">
+				<div class="container text-center">
+					<div class="mb-3">
+						<h5>Gestion d'Événements</h5>
+						<p class="text-white">Plateforme de gestion d'événements et de participants</p>
+					</div>
+					<div>
+						<p class="mb-0">&copy;
+							{{ 'now'|date('Y') }}
+							- Développé avec
+							<i class="fas fa-heart text-danger"></i>
+							Symfony</p>
+					</div>
+				</div>
+			</footer>
+
+			{# Bootstrap JavaScript #}
+			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+			{# Script de validation globale #}
+			<script src="{{ asset('js/validation.js') }}"></script>
+
+			{% block javascripts %}{% endblock %}
+		</body>
+	</html>

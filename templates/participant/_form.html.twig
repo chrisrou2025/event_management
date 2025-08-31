@@ -1,4 +1,4 @@
-
+{# templates/participant/_form.html.twig - Version corrigée #}
 <div class="row">
     <div class="col-md-6 mb-3">
         {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label fw-bold'}}) }}
@@ -16,4 +16,12 @@
     {{ form_label(form.email, 'Adresse email', {'label_attr': {'class': 'form-label fw-bold'}}) }}
     {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
     {{ form_errors(form.email) }}
+</div>
+
+{# Ajout du champ événements manquant #}
+<div class="mb-3">
+    {{ form_label(form.evenements, 'Événements à inscrire', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+    {{ form_widget(form.evenements, {'attr': {'class': 'form-select', 'multiple': true, 'size': 5}}) }}
+    {{ form_errors(form.evenements) }}
+    <div class="form-text">Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs événements</div>
 </div>

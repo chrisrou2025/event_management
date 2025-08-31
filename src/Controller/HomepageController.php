@@ -4,25 +4,36 @@ namespace App\Controller;
 
 use App\Repository\EvenementRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class HomepageController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
-    public function index(EvenementRepository $evenementRepository): Response
+    public function index(Request $request, EvenementRepository $evenementRepository): Response
     {
-        // Récupérer les événements à venir (date >= aujourd'hui)
-        $evenementsAvenir = $evenementRepository->findUpcomingEvents();
-        
-        // Récupérer les 3 derniers événements ajoutés
-        $derniersEvenements = $evenementRepository->findBy(
-            [],
-            ['id' => 'DESC'],
-            3
-        );
-        
-        // Compter le nombre total d'événements et participants
+        $query = $request->query->get('query', '');
+
+        if ($query) {
+            // Tenter de convertir la requête en date
+            try {
+                $date = \DateTime::createFromFormat('d/m/Y', $query);
+                if ($date) {
+                    $evenementsAvenir = $evenementRepository->findByDate($date);
+                } else {
+                    $evenementsAvenir = $evenementRepository->findByLieu($query);
+                }
+            } catch (\Exception $e) {
+                // Si la conversion en date échoue, rechercher par lieu
+                $evenementsAvenir = $evenementRepository->findByLieu($query);
+            }
+            $derniersEvenements = [];
+        } else {
+            $evenementsAvenir = $evenementRepository->findUpcomingEvents();
+            $derniersEvenements = $evenementRepository->findBy([], ['id' => 'DESC'], 3);
+        }
+
         $totalEvenements = $evenementRepository->count([]);
         $totalParticipants = $this->getTotalParticipants($evenementRepository);
 
@@ -31,16 +42,12 @@ class HomepageController extends AbstractController
             'derniers_evenements' => $derniersEvenements,
             'total_evenements' => $totalEvenements,
             'total_participants' => $totalParticipants,
+            'search_query' => $query,
         ]);
     }
 
-    /**
-     * Calculer le nombre total de participants uniques
-     */
     private function getTotalParticipants(EvenementRepository $evenementRepository): int
     {
-        // Cette méthode compte les participants uniques
-        // Nous l'implémentons dans le repository
         return $evenementRepository->countUniqueParticipants();
     }
 }

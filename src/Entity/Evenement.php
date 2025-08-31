@@ -108,20 +108,27 @@ class Evenement
         return $this->participants;
     }
 
+    /**
+     * Ajoute un participant SANS récursion
+     * La synchronisation se fait dans le contrôleur
+     */
     public function addParticipant(Participant $participant): static
     {
         if (!$this->participants->contains($participant)) {
             $this->participants->add($participant);
-            $participant->addEvenement($this);
+            // SUPPRESSION : pas d'appel récursif ici
         }
         return $this;
     }
 
+    /**
+     * Retire un participant SANS récursion
+     * La synchronisation se fait dans le contrôleur
+     */
     public function removeParticipant(Participant $participant): static
     {
-        if ($this->participants->removeElement($participant)) {
-            $participant->removeEvenement($this);
-        }
+        $this->participants->removeElement($participant);
+        // SUPPRESSION : pas d'appel récursif ici
         return $this;
     }
 

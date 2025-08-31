@@ -1,0 +1,7 @@
+framework:
+    assets:
+        packages:
+            app:
+                base_path: '/js'
+            css:
+                base_path: '/css'

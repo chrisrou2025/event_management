@@ -12,31 +12,13 @@
                     </div>
                     <div>
                         <h1 class="h2 mb-1">Gestion des événements</h1>
-                        <p class="text-muted mb-0">Organisez et gérez tous vos événements</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{{ path('app_evenement_new') }}" class="btn btn-success">
-                    <i class="fas fa-plus-circle"></i> Créer un événement
-                </a>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Total des événements</h5>
-                        <p class="card-text display-4">{{ total_evenements }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Total des participants</h5>
-                        <p class="card-text display-4">{{ total_participants }}</p>
+                        <p class="text-muted mb-0">
+                            {% if search_query %}
+                                Résultats pour "{{ search_query }}"
+                            {% else %}
+                                Organisez et gérez tous vos événements
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -47,7 +29,11 @@
                 <div class="d-flex align-items-center mb-3">
                     <h3 class="h4 mb-0">
                         <span class="badge bg-success me-2">{{ evenements_avenir|length }}</span>
-                        Événements à venir
+                        {% if search_query %}
+                            Résultats de recherche
+                        {% else %}
+                            Événements à venir
+                        {% endif %}
                     </h3>
                 </div>
                 <div class="row">
@@ -111,7 +97,7 @@
             </section>
         {% endif %}
 
-        {% if derniers_evenements|length > 0 %}
+        {% if derniers_evenements|length > 0 and not search_query %}
             <section class="mb-5">
                 <div class="d-flex align-items-center mb-3">
                     <h3 class="h4 mb-0">
@@ -168,6 +154,35 @@
                     {% endfor %}
                 </div>
             </section>
+        {% endif %}
+
+        {% if evenements_avenir|length == 0 %}
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-calendar-times fa-4x text-muted"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">
+                                {% if search_query %}
+                                    Aucun résultat pour "{{ search_query }}"
+                                {% else %}
+                                    Aucun événement trouvé
+                                {% endif %}
+                            </h4>
+                            <p class="text-muted mb-4">
+                                Commencez dès maintenant à organiser vos premiers événements !
+                            </p>
+                            <div class="d-grid gap-2 d-md-block">
+                                <a href="{{ path('app_evenement_new') }}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-plus-circle"></i> Créer un événement
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

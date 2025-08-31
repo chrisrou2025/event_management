@@ -1,5 +1,4 @@
 <?php
-// src/Entity/Participant.php - Version corrigée
 
 namespace App\Entity;
 
@@ -85,20 +84,27 @@ class Participant
         return $this->evenements;
     }
 
+    /**
+     * Ajoute un événement SANS récursion
+     * La synchronisation se fait dans le contrôleur
+     */
     public function addEvenement(Evenement $evenement): static
     {
         if (!$this->evenements->contains($evenement)) {
             $this->evenements->add($evenement);
-            $evenement->addParticipant($this);
+            // SUPPRESSION : pas d'appel récursif ici
         }
         return $this;
     }
 
+    /**
+     * Retire un événement SANS récursion
+     * La synchronisation se fait dans le contrôleur
+     */
     public function removeEvenement(Evenement $evenement): static
     {
-        if ($this->evenements->removeElement($evenement)) {
-            $evenement->removeParticipant($this);
-        }
+        $this->evenements->removeElement($evenement);
+        // SUPPRESSION : pas d'appel récursif ici
         return $this;
     }
 }
