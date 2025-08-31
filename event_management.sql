@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : sam. 30 août 2025 à 15:26
+-- Généré le : dim. 31 août 2025 à 19:27
 -- Version du serveur : 9.1.0
 -- Version de PHP : 8.3.14
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `doctrine_migration_versions` (
-  `version` varchar(191) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `version` varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `executed_at` datetime DEFAULT NULL,
   `execution_time` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
@@ -38,7 +38,9 @@ CREATE TABLE `doctrine_migration_versions` (
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
-('DoctrineMigrations\\Version20250830092741', '2025-08-30 09:28:04', 196);
+('DoctrineMigrations\\Version20250830092741', '2025-08-30 09:28:04', 196),
+('DoctrineMigrations\\Version202508310406AddImageToEvenement', '2025-08-31 14:14:29', 10),
+('DoctrineMigrations\\Version20250831150036', '2025-08-31 15:00:46', 9);
 
 -- --------------------------------------------------------
 
@@ -48,18 +50,21 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 
 CREATE TABLE `evenement` (
   `id` int NOT NULL,
-  `titre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `titre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `date` datetime NOT NULL,
-  `lieu` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` longtext COLLATE utf8mb4_unicode_ci
+  `lieu` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `evenement`
 --
 
-INSERT INTO `evenement` (`id`, `titre`, `date`, `lieu`, `description`) VALUES
-(1, 'Trekking en montagne', '2025-12-31 00:00:00', 'Mont Blanc', 'Une ballade tranquille par -20° ^^ petit joueur s\'abstenir');
+INSERT INTO `evenement` (`id`, `titre`, `date`, `lieu`, `description`, `image`, `updated_at`) VALUES
+(1, 'Trekking en montagne', '2025-12-31 00:00:00', 'Mont Blanc', 'Une ballade tranquille par -20° ^^ petit joueur s\'abstenir', 'tour-mont-blanc-68b463e84e63b349860220.jpg', '2025-08-31 15:02:00'),
+(2, 'Couscous party', '2025-09-03 12:00:00', 'Restaurant Le Terminus', 'Un très bon couscous comme Là-bas ^^', 'resto-68b4773085c65539590664.jpg', '2025-08-31 16:24:16');
 
 -- --------------------------------------------------------
 
@@ -69,9 +74,9 @@ INSERT INTO `evenement` (`id`, `titre`, `date`, `lieu`, `description`) VALUES
 
 CREATE TABLE `messenger_messages` (
   `id` bigint NOT NULL,
-  `body` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `headers` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue_name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue_name` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
@@ -85,9 +90,9 @@ CREATE TABLE `messenger_messages` (
 
 CREATE TABLE `participant` (
   `id` int NOT NULL,
-  `nom` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `prenom` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL
+  `nom` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `prenom` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -95,7 +100,9 @@ CREATE TABLE `participant` (
 --
 
 INSERT INTO `participant` (`id`, `nom`, `prenom`, `email`) VALUES
-(1, 'Roupioz', 'christian', 'ch.roupioz@laposte.net');
+(1, 'Roupioz', 'christian', 'ch.roupioz@laposte.net'),
+(2, 'Machin', 'Boulex', 'boulex@gmail.com'),
+(3, 'Machin', 'Jerem', 'jerem@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -113,7 +120,10 @@ CREATE TABLE `participant_evenement` (
 --
 
 INSERT INTO `participant_evenement` (`participant_id`, `evenement_id`) VALUES
-(1, 1);
+(1, 1),
+(1, 2),
+(2, 2),
+(3, 2);
 
 --
 -- Index pour les tables déchargées
@@ -163,7 +173,7 @@ ALTER TABLE `participant_evenement`
 -- AUTO_INCREMENT pour la table `evenement`
 --
 ALTER TABLE `evenement`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `messenger_messages`
@@ -175,7 +185,7 @@ ALTER TABLE `messenger_messages`
 -- AUTO_INCREMENT pour la table `participant`
 --
 ALTER TABLE `participant`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Contraintes pour les tables déchargées
